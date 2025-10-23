@@ -15,6 +15,16 @@ class Settings:
         self.frm_margin = 5
         self.frm_margin_bottom = 82
 
+        self.lvl_start_pos_x = 40
+        self.lvl_start_pos_y = 300
+
+        self.plr_color = 'Black'
+        self.plr_width = 8
+        self.plr_height = 18
+
+        self.door_width = 20
+        self.door_height = 30
+
         # self.door_pos_x =
 
 settings = Settings()
@@ -36,18 +46,25 @@ tk.update()
 #  Описываем класс Player, который отвечает за платформы
 class Player:
     # конструктор
-    def __init__(self, canvas, color):
+    def __init__(self, canvas, settings, level):
         # canvas означает, что платформа будет нарисована на нашем изначальном холсте
         self.canvas = canvas
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
-        self.id = canvas.create_rectangle(0, 0, 4, 4, fill=color)
-        self.id2 = canvas.create_rectangle(-2, 4, 6, 18, fill=color)
+        self.id = canvas.create_polygon(
+            -settings.plr_width/4, 0, 
+            settings.plr_width/4, 0, 
+            settings.plr_width/4, 4, 
+            settings.plr_width/2, 4,
+            settings.plr_width/2, settings.plr_height,
+            -settings.plr_width/2, settings.plr_height,
+            -settings.plr_width/2, 4,
+            -settings.plr_width/4, 4,
+            fill=settings.plr_color)
         # задаём список возможных стартовых положений платформы
         # выбираем первое из перемешанных
-        self.starting_point_x = 40
         # перемещаем платформу в стартовое положение
-        self.canvas.move(self.id, self.starting_point_x, 300)
-        self.canvas.move(self.id2, self.starting_point_x, 300)
+        self.canvas.move(self.id, settings.lvl_start_pos_x, settings.lvl_start_pos_y)
+        #self.canvas.move(self.id2, settings.lvl_start_pos_x, settings.lvl_start_pos_y)
         # пока платформа никуда не движется, поэтому изменений по оси х нет
         self.x = 0
         self.y = 0
@@ -70,7 +87,7 @@ class Player:
     def turn_right(self, event):
         pos = self.canvas.coords(self.id)
         # если мы не упёрлись в правую границу 
-        if pos[0] < 485:
+        if pos[2] <= level.left_right_x - settings.plr_width/2:
             self.x = 2
 
     # движемся вправо 
@@ -86,7 +103,7 @@ class Player:
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
         # если мы не упёрлись в левую границу 
-        if pos[0] > 8:
+        if pos[0] >= level.left_bound_x + settings.plr_width:
             self.x = -2
     # прыжок
     def jump(self, event):
@@ -101,10 +118,10 @@ class Player:
     def draw(self):
         # сдвигаем нашу платформу на заданное количество пикселей
         self.canvas.move(self.id, self.x, 0)
-        self.canvas.move(self.id2, self.x, 0)
+        #self.canvas.move(self.id2, self.x, 0)
 
         self.canvas.move(self.id, 0, self.y)
-        self.canvas.move(self.id2, 0, self.y)
+        #self.canvas.move(self.id2, 0, self.y)
 
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
@@ -113,7 +130,7 @@ class Player:
             # останавливаемся
             self.x = 0
         # если упёрлись в правую границу 
-        elif pos[2] >= self.canvas_width:
+        elif pos[2] > level.left_right_x - settings.plr_width/2:
             # останавливаемся
             self.x = 0
 
@@ -133,18 +150,20 @@ class Frame:
         self.canvas = canvas
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
         self.id = canvas.create_rectangle(0, 0, settings.wnd_width, settings.wnd_height, fill=settings.frm_background)
-        self.id2 = canvas.create_rectangle(settings.frm_margin, settings.frm_margin, settings.wnd_width-settings.frm_margin, settings.wnd_height-settings.frm_margin_bottom, fill=settings.frm_background_field)
-        self.id3 = canvas.create_rectangle(450, 318, 470, 280, fill='Grey')
-        # задаём список возможных стартовых положений платформы
-        # выбираем первое из перемешанных
-        self.starting_point_x = 0
-        # перемещаем платформу в стартовое положение
-        # self.canvas.move(self.id, self.starting_point_x, 300)
-        # пока платформа никуда не движется, поэтому изменений по оси х нет
-        self.x = 0
-        # платформа узнаёт свою ширину
-        self.canvas_width = self.canvas.winfo_width()
-        # задаём обработчик нажатий
+
+class Level:
+    # конструктор
+    def __init__(self, canvas, settings):
+        # canvas означает, что платформа будет нарисована на нашем изначальном холсте
+        self.canvas = canvas
+        self.left_bound_x = settings.frm_margin
+        self.left_right_x = settings.wnd_width-settings.frm_margin
+        self.bottom_bound_y = settings.wnd_height-settings.frm_margin_bottom
+
+        self.door_left_pos_x = self.left_right_x -50
+        # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
+        self.level_id = canvas.create_rectangle(self.left_bound_x, settings.frm_margin, self.left_right_x, settings.wnd_height-settings.frm_margin_bottom, fill=settings.frm_background_field)
+        self.exit_id = canvas.create_rectangle(self.door_left_pos_x, self.bottom_bound_y, self.door_left_pos_x + settings.door_width, self.bottom_bound_y - settings.door_height, fill='Grey')
 
 #  Описываем класс Score, который отвечает за отображение счетов
 class Score:
@@ -170,8 +189,9 @@ class Score:
 
 # создаём фрейм
 frame = Frame(canvas, settings)
+level = Level(canvas, settings)
 # создаём объект — белую платформу
-player = Player(canvas, 'Black')
+player = Player(canvas, settings, level)
 # создаём объект — зелёный счёт 
 score = Score(canvas, player, 'green')
 # создаём объект — красный шарик 
