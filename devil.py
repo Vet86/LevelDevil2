@@ -3,7 +3,11 @@ from tkinter import *
 # подключаем модули, которые отвечают за время и случайные числа
 import time
 import random
+import sys
+import os
 
+sys.path.append(os.path.abspath("level1"))
+from level1 import *
 
 class Settings:
     def __init__(self):
@@ -175,22 +179,6 @@ class Frame:
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
         self.id = canvas.create_rectangle(0, 0, settings.wnd_width, settings.wnd_height, fill=settings.frm_background)
 
-class Level:
-    # конструктор
-    def __init__(self, canvas, settings):
-        # canvas означает, что платформа будет нарисована на нашем изначальном холсте
-        self.is_plaing = True
-        self.canvas = canvas
-        self.left_bound_x = settings.frm_margin
-        self.left_right_x = settings.wnd_width-settings.frm_margin
-        self.bottom_bound_y = settings.wnd_height-settings.frm_margin_bottom
-        self.bottom_bound_y_with_player = settings.wnd_height-settings.frm_margin_bottom-settings.plr_height
-
-        self.door_left_pos_x = self.left_right_x -50
-        # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
-        self.level_id = canvas.create_rectangle(self.left_bound_x, settings.frm_margin, self.left_right_x, settings.wnd_height-settings.frm_margin_bottom, fill=settings.frm_background_field)
-        self.exit_id = canvas.create_rectangle(self.door_left_pos_x, self.bottom_bound_y, self.door_left_pos_x + settings.door_width, self.bottom_bound_y - settings.door_height, fill='Grey')
-
 #  Описываем класс Score, который отвечает за отображение счетов
 class Score:
     # конструктор
@@ -215,7 +203,7 @@ class Score:
 
 # создаём фрейм
 frame = Frame(canvas, settings)
-level = Level(canvas, settings)
+level = Level1(canvas, settings)
 # создаём объект — белую платформу
 player = Player(canvas, settings, level)
 # создаём объект — зелёный счёт 
