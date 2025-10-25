@@ -6,8 +6,8 @@ import random
 import sys
 import os
 
-sys.path.append(os.path.abspath("level1"))
-from level1 import *
+sys.path.append(os.path.abspath("./Levels"))
+from level_01 import *
 
 class Settings:
     def __init__(self):
