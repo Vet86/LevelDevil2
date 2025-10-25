@@ -21,6 +21,7 @@ class Settings:
         self.plr_color = 'Black'
         self.plr_width = 8
         self.plr_height = 18
+        self.plr_jump_height = 55
 
         self.door_width = 20
         self.door_height = 30
@@ -85,6 +86,11 @@ class Player:
         self.started = False
     # движемся вправо 
     def turn_right(self, event):
+        if level.is_plaing == False:
+            self.x = 0
+            self.y = 0
+            return
+
         pos = self.canvas.coords(self.id)
         # если мы не упёрлись в правую границу 
         if pos[2] <= level.left_right_x - settings.plr_width/2:
@@ -100,6 +106,10 @@ class Player:
 
     # движемся влево
     def turn_left(self, event):
+        if level.is_plaing == False:
+            self.x = 0
+            self.y = 0
+            return
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
         # если мы не упёрлись в левую границу 
@@ -107,6 +117,11 @@ class Player:
             self.x = -2
     # прыжок
     def jump(self, event):
+        if level.is_plaing == False:
+            self.x = 0
+            self.y = 0
+            return
+
         if self.jumping == True:
             return
 
@@ -123,6 +138,11 @@ class Player:
         self.canvas.move(self.id, 0, self.y)
         #self.canvas.move(self.id2, 0, self.y)
 
+        if level.is_plaing == False:
+            self.x = 0
+            self.y = 0
+            return
+
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
         # если мы упёрлись в левую границу 
@@ -134,14 +154,18 @@ class Player:
             # останавливаемся
             self.x = 0
 
-        if self.y == -2 and pos[1] <= 255:
+        if self.y == -2 and pos[1] <= level.bottom_bound_y_with_player-settings.plr_jump_height:
             # останавливаемся
             self.y = 2
 
-        elif self.y == 2 and pos[1] >= 300:
+        elif self.y == 2 and pos[1] >= level.bottom_bound_y_with_player:
             # останавливаемся
             self.y = 0
             self.jumping = False
+
+        if pos[0] >= (level.door_left_pos_x) and pos[2]<=level.door_left_pos_x+settings.door_width and self.jumping == False:
+            level.is_plaing = False
+
 
 class Frame:
     # конструктор
@@ -155,10 +179,12 @@ class Level:
     # конструктор
     def __init__(self, canvas, settings):
         # canvas означает, что платформа будет нарисована на нашем изначальном холсте
+        self.is_plaing = True
         self.canvas = canvas
         self.left_bound_x = settings.frm_margin
         self.left_right_x = settings.wnd_width-settings.frm_margin
         self.bottom_bound_y = settings.wnd_height-settings.frm_margin_bottom
+        self.bottom_bound_y_with_player = settings.wnd_height-settings.frm_margin_bottom-settings.plr_height
 
         self.door_left_pos_x = self.left_right_x -50
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
