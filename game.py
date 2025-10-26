@@ -20,3 +20,10 @@ class Game:
         if self.game_state == GameState.InProcess and pos[0] >= (self.level.door_left_pos_x) and pos[2]<=self.level.door_left_pos_x+self.settings.door_width and self.player.jumping == False:
             self.game_state = GameState.FinishSuccessfully
             self.player.can_move = False
+
+        bound_player = self.canvas.bbox(self.player.id)
+        m = 3
+        for hook in self.level.hooks:
+            if (bound_player[0] < hook[2] -m and bound_player[2] > hook[0] + m and
+                bound_player[1] < hook[3] -m and bound_player[3] > hook[1] + m):
+                self.game_state = GameState.FinishUnsuccessfully

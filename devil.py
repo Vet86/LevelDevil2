@@ -171,6 +171,9 @@ class Player:
         self.canvas.move(self.id, -pos[0], -pos[1])
         self.canvas.move(self.id, level.lvl_start_pos_x, level.lvl_start_pos_y)
         self.can_move = True
+        self.x = 0
+        self.y = 0
+        self.jumping = False
 
 class Frame:
     # конструктор
@@ -206,9 +209,9 @@ cur_level = 1
 # создаём фрейм
 frame = Frame(canvas, settings)
 
-levels = [Level1(canvas, settings), Level2(canvas, settings)]
+levels = [Level1, Level2]
 
-level = levels[cur_level - 1]
+level = levels[cur_level - 1](canvas, settings)
 
 # делаем заголовок окна — Games с помощью свойства объекта title
 tk.title('Level Devil 2 - ' + level.name)
@@ -233,12 +236,17 @@ while True:
     game.calc()
 
     if game.game_state == GameState.FinishSuccessfully:
-        time.sleep(3)
+        time.sleep(2)
         level.destruct()
         cur_level += 1
-        level = levels[cur_level - 1]
+        level = levels[cur_level - 1](canvas, settings)
         tk.title('Level Devil 2 - ' + level.name)
         #player = Player(canvas, settings, level)
+        player.start_level()
+        game.game_state = GameState.InProcess
+
+    if game.game_state == GameState.FinishUnsuccessfully:
+        time.sleep(2)
         player.start_level()
         game.game_state = GameState.InProcess
 
