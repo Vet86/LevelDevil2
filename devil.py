@@ -7,7 +7,11 @@ import sys
 import os
 
 sys.path.append(os.path.abspath("./Levels"))
+sys.path.append(os.path.abspath("."))
 from level_01 import *
+from level_02 import *
+from game_state import *
+from game import *
 
 class Settings:
     def __init__(self):
@@ -18,9 +22,6 @@ class Settings:
         self.frm_background_field = 'White'
         self.frm_margin = 5
         self.frm_margin_bottom = 82
-
-        self.lvl_start_pos_x = 40
-        self.lvl_start_pos_y = 300
 
         self.plr_color = 'Black'
         self.plr_width = 8
@@ -35,8 +36,6 @@ class Settings:
 settings = Settings()
 # создаём новый объект — окно с игровым полем. В нашем случае переменная окна называется tk, и мы его сделали из класса Tk() — он есть в графической библиотеке 
 tk = Tk()
-# делаем заголовок окна — Games с помощью свойства объекта title
-tk.title('Level Devil 2')
 # запрещаем менять размеры окна, для этого используем свойство resizable 
 tk.resizable(0, 0)
 # помещаем наше игровое окно выше остальных окон на компьютере, чтобы другие окна не могли его заслонить. Попробуйте :)
@@ -54,6 +53,7 @@ class Player:
     def __init__(self, canvas, settings, level):
         # canvas означает, что платформа будет нарисована на нашем изначальном холсте
         self.canvas = canvas
+        self.can_move = False
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
         self.id = canvas.create_polygon(
             -settings.plr_width/4, 0, 
@@ -68,7 +68,6 @@ class Player:
         # задаём список возможных стартовых положений платформы
         # выбираем первое из перемешанных
         # перемещаем платформу в стартовое положение
-        self.canvas.move(self.id, settings.lvl_start_pos_x, settings.lvl_start_pos_y)
         #self.canvas.move(self.id2, settings.lvl_start_pos_x, settings.lvl_start_pos_y)
         # пока платформа никуда не движется, поэтому изменений по оси х нет
         self.x = 0
@@ -90,7 +89,7 @@ class Player:
         self.started = False
     # движемся вправо 
     def turn_right(self, event):
-        if level.is_plaing == False:
+        if self.can_move == False:
             self.x = 0
             self.y = 0
             return
@@ -110,18 +109,18 @@ class Player:
 
     # движемся влево
     def turn_left(self, event):
-        if level.is_plaing == False:
+        if self.can_move == False:
             self.x = 0
             self.y = 0
             return
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
         # если мы не упёрлись в левую границу 
-        if pos[0] >= level.left_bound_x + settings.plr_width:
+        if pos[0] >= level.left_bound_x + settings.plr_width/2:
             self.x = -2
     # прыжок
     def jump(self, event):
-        if level.is_plaing == False:
+        if self.can_move == False:
             self.x = 0
             self.y = 0
             return
@@ -142,7 +141,7 @@ class Player:
         self.canvas.move(self.id, 0, self.y)
         #self.canvas.move(self.id2, 0, self.y)
 
-        if level.is_plaing == False:
+        if self.can_move == False:
             self.x = 0
             self.y = 0
             return
@@ -150,7 +149,7 @@ class Player:
         # получаем координаты холста
         pos = self.canvas.coords(self.id)
         # если мы упёрлись в левую границу 
-        if pos[0] <= 0:
+        if pos[0] < level.left_bound_x + settings.plr_width/2:
             # останавливаемся
             self.x = 0
         # если упёрлись в правую границу 
@@ -166,10 +165,12 @@ class Player:
             # останавливаемся
             self.y = 0
             self.jumping = False
-
-        if pos[0] >= (level.door_left_pos_x) and pos[2]<=level.door_left_pos_x+settings.door_width and self.jumping == False:
-            level.is_plaing = False
-
+        
+    def start_level(self):
+        pos = self.canvas.coords(self.id)
+        self.canvas.move(self.id, -pos[0], -pos[1])
+        self.canvas.move(self.id, level.lvl_start_pos_x, level.lvl_start_pos_y)
+        self.can_move = True
 
 class Frame:
     # конструктор
@@ -200,14 +201,25 @@ class Score:
 
 
 
+cur_level = 1
 
 # создаём фрейм
 frame = Frame(canvas, settings)
-level = Level1(canvas, settings)
+
+levels = [Level1(canvas, settings), Level2(canvas, settings)]
+
+level = levels[cur_level - 1]
+
+# делаем заголовок окна — Games с помощью свойства объекта title
+tk.title('Level Devil 2 - ' + level.name)
+
 # создаём объект — белую платформу
 player = Player(canvas, settings, level)
+player.start_level()
 # создаём объект — зелёный счёт 
 score = Score(canvas, player, 'green')
+
+game = Game(canvas, settings, player, level)
 # создаём объект — красный шарик 
 # ball = Ball(canvas, player, score, 'red')
 # пока шарик не коснулся дна 
@@ -218,11 +230,25 @@ while True:
     score.draw()
     player.draw()
 
+    game.calc()
+
+    if game.game_state == GameState.FinishSuccessfully:
+        time.sleep(3)
+        level.destruct()
+        cur_level += 1
+        level = levels[cur_level - 1]
+        tk.title('Level Devil 2 - ' + level.name)
+        #player = Player(canvas, settings, level)
+        player.start_level()
+        game.game_state = GameState.InProcess
+
+
     # обновляем наше игровое поле, чтобы всё, что нужно, закончило рисоваться
     tk.update_idletasks()
     # обновляем игровое поле и смотрим за тем, чтобы всё, что должно было быть сделано — было сделано
     tk.update()
     # замираем на одну сотую секунды, чтобы движение элементов выглядело плавно
+
     time.sleep(0.01)
 # если программа дошла досюда, значит, шарик коснулся дна. Ждём 3 секунды, пока игрок прочитает финальную надпись, и завершаем игру
 time.sleep(3)

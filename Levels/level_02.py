@@ -1,8 +1,8 @@
-class Level1:
+class Level2:
     # конструктор
     def __init__(self, canvas, settings):
         # canvas означает, что платформа будет нарисована на нашем изначальном холсте
-    
+        self.is_plaing = True
         self.canvas = canvas
         self.left_bound_x = settings.frm_margin
         self.left_right_x = settings.wnd_width-settings.frm_margin
@@ -13,10 +13,10 @@ class Level1:
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
         self.level_id = canvas.create_rectangle(self.left_bound_x, settings.frm_margin, self.left_right_x, settings.wnd_height-settings.frm_margin_bottom, fill=settings.frm_background_field)
         self.exit_id = canvas.create_rectangle(self.door_left_pos_x, self.bottom_bound_y, self.door_left_pos_x + settings.door_width, self.bottom_bound_y - settings.door_height, fill='Grey')
+        
+        self.name = 'Уровень 2'
 
-        self.name = 'Уровень 1'
-
-        self.lvl_start_pos_x = 40
+        self.lvl_start_pos_x = 20
         self.lvl_start_pos_y = 300
 
     def destruct(self):
