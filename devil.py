@@ -55,16 +55,7 @@ class Player:
         self.canvas = canvas
         self.can_move = False
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
-        self.id = canvas.create_polygon(
-            -settings.plr_width/4, 0, 
-            settings.plr_width/4, 0, 
-            settings.plr_width/4, 4, 
-            settings.plr_width/2, 4,
-            settings.plr_width/2, settings.plr_height,
-            -settings.plr_width/2, settings.plr_height,
-            -settings.plr_width/2, 4,
-            -settings.plr_width/4, 4,
-            fill=settings.plr_color)
+
         # задаём список возможных стартовых положений платформы
         # выбираем первое из перемешанных
         # перемещаем платформу в стартовое положение
@@ -167,8 +158,21 @@ class Player:
             self.jumping = False
         
     def start_level(self):
-        pos = self.canvas.coords(self.id)
-        self.canvas.move(self.id, -pos[0], -pos[1])
+        if hasattr(self, 'id'):
+            self.canvas.delete(self.id)
+
+        self.id = canvas.create_polygon(
+            -settings.plr_width/4, 0, 
+            settings.plr_width/4, 0, 
+            settings.plr_width/4, 4, 
+            settings.plr_width/2, 4,
+            settings.plr_width/2, settings.plr_height,
+            -settings.plr_width/2, settings.plr_height,
+            -settings.plr_width/2, 4,
+            -settings.plr_width/4, 4,
+            fill=settings.plr_color)
+        
+        #self.canvas.move(self.id, -pos[0], -pos[1])
         self.canvas.move(self.id, level.lvl_start_pos_x, level.lvl_start_pos_y)
         self.can_move = True
         self.x = 0
@@ -243,6 +247,7 @@ while True:
         tk.title('Level Devil 2 - ' + level.name)
         #player = Player(canvas, settings, level)
         player.start_level()
+        game.level = level
         game.game_state = GameState.InProcess
 
     if game.game_state == GameState.FinishUnsuccessfully:

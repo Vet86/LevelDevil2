@@ -3,6 +3,7 @@ import os
 
 sys.path.append(os.path.abspath("."))
 from game_state import *
+from hook import *
 
 class Game:
     # конструктор
@@ -24,6 +25,7 @@ class Game:
         bound_player = self.canvas.bbox(self.player.id)
         m = 3
         for hook in self.level.hooks:
-            if (bound_player[0] < hook[2] -m and bound_player[2] > hook[0] + m and
-                bound_player[1] < hook[3] -m and bound_player[3] > hook[1] + m):
+            bbox = hook.bbox
+            if (bound_player[0] < bbox[2] -m and bound_player[2] > bbox[0] + m and
+                bound_player[1] < bbox[3] -m and bound_player[3] > bbox[1] + m):
                 self.game_state = GameState.FinishUnsuccessfully

@@ -1,3 +1,9 @@
+import sys
+import os
+
+sys.path.append(os.path.abspath("..\."))
+from hook import *
+
 class Level1:
     # конструктор
     def __init__(self, canvas, settings):
@@ -25,8 +31,10 @@ class Level1:
         self.lvl_start_pos_x = 40
         self.lvl_start_pos_y = 300
 
-        self.hooks = [canvas.bbox(self.hook_id)]
+        hook1 = Hook(canvas.bbox(self.hook_id))
+        self.hooks = [hook1]
     
     def destruct(self):
         self.canvas.delete(self.level_id)
         self.canvas.delete(self.exit_id)
+        self.canvas.delete(self.hook_id)

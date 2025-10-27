@@ -9,7 +9,7 @@ class Level2:
         self.bottom_bound_y = settings.wnd_height-settings.frm_margin_bottom
         self.bottom_bound_y_with_player = settings.wnd_height-settings.frm_margin_bottom-settings.plr_height
 
-        self.door_left_pos_x = self.left_right_x -50
+        self.door_left_pos_x = self.left_right_x - 100
         # создаём прямоугольную платформу 10 на 100 пикселей, закрашиваем выбранным цветом и получаем её внутреннее имя 
         self.level_id = canvas.create_rectangle(self.left_bound_x, settings.frm_margin, self.left_right_x, settings.wnd_height-settings.frm_margin_bottom, fill=settings.frm_background_field)
         self.exit_id = canvas.create_rectangle(self.door_left_pos_x, self.bottom_bound_y, self.door_left_pos_x + settings.door_width, self.bottom_bound_y - settings.door_height, fill='Grey')
@@ -18,6 +18,8 @@ class Level2:
 
         self.lvl_start_pos_x = 20
         self.lvl_start_pos_y = 300
+
+        self.hooks = []
 
     def destruct(self):
         self.canvas.delete(self.level_id)
