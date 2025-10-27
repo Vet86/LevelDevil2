@@ -238,6 +238,7 @@ while True:
     player.draw()
 
     game.calc()
+    level.calc()
 
     if game.game_state == GameState.FinishSuccessfully:
         time.sleep(2)
@@ -252,6 +253,7 @@ while True:
 
     if game.game_state == GameState.FinishUnsuccessfully:
         time.sleep(2)
+        level.start_level()
         player.start_level()
         game.game_state = GameState.InProcess
 

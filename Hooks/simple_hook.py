@@ -1,3 +1,3 @@
-class Hook:
+class SimpleHook:
     def __init__(self, bbox):
         self.bbox = bbox

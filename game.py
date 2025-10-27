@@ -1,9 +1,10 @@
 import sys
 import os
 
-sys.path.append(os.path.abspath("."))
+sys.path.append(os.path.abspath("Hooks\."))
 from game_state import *
-from hook import *
+from simple_hook import *
+from move_up_hook import *
 
 class Game:
     # конструктор
@@ -25,6 +26,8 @@ class Game:
         bound_player = self.canvas.bbox(self.player.id)
         m = 3
         for hook in self.level.hooks:
+            if type(hook) is MoveUpHook and hook.state == 0 and pos[0] >= hook.act_pos_x:
+                hook.state = 1
             bbox = hook.bbox
             if (bound_player[0] < bbox[2] -m and bound_player[2] > bbox[0] + m and
                 bound_player[1] < bbox[3] -m and bound_player[3] > bbox[1] + m):
