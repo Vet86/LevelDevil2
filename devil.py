@@ -10,6 +10,7 @@ sys.path.append(os.path.abspath("./Levels"))
 sys.path.append(os.path.abspath("."))
 from level_01 import *
 from level_02 import *
+from level_03 import *
 from game_state import *
 from game import *
 
@@ -213,7 +214,7 @@ cur_level = 1
 # создаём фрейм
 frame = Frame(canvas, settings)
 
-levels = [Level1, Level2]
+levels = [Level1, Level2, Level3]
 
 level = levels[cur_level - 1](canvas, settings)
 
@@ -230,7 +231,8 @@ game = Game(canvas, settings, player, level)
 # создаём объект — красный шарик 
 # ball = Ball(canvas, player, score, 'red')
 # пока шарик не коснулся дна 
-while True:
+game_exit = False
+while game_exit == False:
     # двигаем шарик
     # ball.draw()
     # двигаем платформу
@@ -244,12 +246,15 @@ while True:
         time.sleep(2)
         level.destruct()
         cur_level += 1
-        level = levels[cur_level - 1](canvas, settings)
-        tk.title('Level Devil 2 - ' + level.name)
-        #player = Player(canvas, settings, level)
-        player.start_level()
-        game.level = level
-        game.game_state = GameState.InProcess
+        if cur_level > len(levels):
+            game_exit = True
+        else:
+            level = levels[cur_level - 1](canvas, settings)
+            tk.title('Level Devil 2 - ' + level.name)
+            #player = Player(canvas, settings, level)
+            player.start_level()
+            game.level = level
+            game.game_state = GameState.InProcess
 
     if game.game_state == GameState.FinishUnsuccessfully:
         time.sleep(2)
