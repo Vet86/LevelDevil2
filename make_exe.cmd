@@ -1,0 +1,1 @@
+pyinstaller --noconfirm --onefile --windowed --add-data "D:\src\vet86\LevelDevil2\Hooks\move_up_hook.py;." --add-data "D:\src\vet86\LevelDevil2\Hooks\simple_hook.py;." --add-data "D:\src\vet86\LevelDevil2\Levels\level_01.py;." --add-data "D:\src\vet86\LevelDevil2\Levels\level_02.py;." --add-data "D:\src\vet86\LevelDevil2\Levels\level_03.py;."  "D:\src\vet86\LevelDevil2\devil.py"
